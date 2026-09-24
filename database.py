@@ -52,10 +52,11 @@ def add_patient(name: str, age: int, diagnosis: str) -> dict:
             "diagnosis": diagnosis
         }
 
-def get_patients() -> list[dict]:
+def get_patients(limit: int = 10, offset: int = 0) -> list[dict]:
     with DatabaseConnection() as connection:
         cursor = connection.execute(
-            "SELECT id, name, age, diagnosis FROM patients ORDER BY id;"
+            "SELECT id, name, age, diagnosis FROM patients ORDER BY id LIMIT ? OFFSET ?;",
+            (limit, offset)
         )
 
         rows = cursor.fetchall()

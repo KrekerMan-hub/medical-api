@@ -2,7 +2,7 @@
 # FastAPI
 #==========================
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Query
 from schemas import PatientCreate, PatientResponse, DiagnosisUpdate
 from database import init_db, add_patient, get_patients, get_patient_by_id, update_diagnosis, delete_patient
 
@@ -34,8 +34,11 @@ def receive_patients(patient: PatientCreate):
     )
 
 @app.get("/patients", response_model=list[PatientResponse])
-def show_patients():
-    return get_patients()
+def show_patients(
+    limit: int = Query(default=10, ge=1, le=100),
+    offset: int = Query(default=0, ge=0)
+):
+    return get_patients(limit=limit, offset=offset)
 
 @app.get("/patients/{patient_id}", response_model=PatientResponse)
 def show_patient(patient_id: int):
