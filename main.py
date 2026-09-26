@@ -36,9 +36,11 @@ def receive_patients(patient: PatientCreate):
 @app.get("/patients", response_model=list[PatientResponse])
 def show_patients(
     limit: int = Query(default=10, ge=1, le=100),
-    offset: int = Query(default=0, ge=0)
+    offset: int = Query(default=0, ge=0),
+    min_age: int | None = Query(default=None, ge=0, le=120),
+    name: str | None = Query(default=None, min_length=0, max_length=100)
 ):
-    return get_patients(limit=limit, offset=offset)
+    return get_patients(limit=limit, offset=offset, min_age=min_age, name=name)
 
 @app.get("/patients/{patient_id}", response_model=PatientResponse)
 def show_patient(patient_id: int):

@@ -52,15 +52,31 @@ def add_patient(name: str, age: int, diagnosis: str) -> dict:
             "diagnosis": diagnosis
         }
 
-def get_patients(limit: int = 10, offset: int = 0) -> list[dict]:
+def get_patients(limit: int = 10, 
+                 offset: int = 0, 
+                 min_age: int | None = None,
+                 name: str | None = None) -> list[dict]:
+    query = "SELECT id, name, age, diagnosis FROM patients"
+    conditions = []
+    params = []
+
+    if min_age is not None:
+        conditions.append("age >= ?")
+        params.append(min_age)
+
+    if name is not None:
+        conditions.append("name LIKE ?")
+        params.append(f"%{name}%")
+
+    if conditions:
+        query += " WHERE " + " AND ".join(conditions)
+
+    query += " ORDER BY id LIMIT ? OFFSET ?;"
+    params.extend([limit, offset])
+
     with DatabaseConnection() as connection:
-        cursor = connection.execute(
-            "SELECT id, name, age, diagnosis FROM patients ORDER BY id LIMIT ? OFFSET ?;",
-            (limit, offset)
-        )
-
+        cursor = connection.execute(query, params)
         rows = cursor.fetchall()
-
 
     patients = []
 
